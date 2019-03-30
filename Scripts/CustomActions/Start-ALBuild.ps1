@@ -1,8 +1,11 @@
 Write-Host Build and Update Docker Container
 & (Join-path $PSScriptRoot 'Build-NavEnvironment.ps1')
+
 if (![String]::IsNullOrEmpty($SetupParameters.CreateSymbols)) {
     & (Join-path $PSScriptRoot 'Build-NAVSymbolReferences.ps1')
 }
+
+& (Join-path $PSScriptRoot 'ImportFrom-CALDependencies.ps1')
 
 Write-Host Initialize Test Company
 & (Join-path $PSScriptRoot 'Initialize-NAVCompany.ps1')

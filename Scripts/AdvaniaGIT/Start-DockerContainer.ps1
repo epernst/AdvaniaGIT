@@ -48,7 +48,8 @@
     $parameters = @(
                 "--volume `"$volume`"",
                 "--volume `"$rootPath`"",
-                "--env SqlTimeout=1200")
+                "--env SqlTimeout=1200",
+                "--dns 8.8.8.8")
 
     if ($SetupParameters.BuildMode) {
         $parameters += @("--env webClient=N",
@@ -81,6 +82,10 @@
             $params += @{ auth = $SetupParameters.dockerAuthentication }
         }
 
+        if (![System.String]::IsNullOrEmpty($SetupParameters.dockerEnableSymbolLoading)) {
+            $params += @{ enableSymbolLoading = $true }
+        }
+
         if ($SetupParameters.BuildMode) {
             $DockerContainerFriendlyName = "BC$((New-Guid).ToString().Replace('-','').Substring(0,13))"
         } else {
@@ -91,7 +96,7 @@
             }
         }
         if ((Get-NavContainers) -inotcontains $DockerContainerFriendlyName) { 
-            New-NavContainer -accept_eula -accept_outdated  -imageName $imageName -containerName $DockerContainerFriendlyName -Credential $DockerCredentials @params -enableSymbolLoading -alwaysPull -includeCSide -restart no
+            New-NavContainer -accept_eula -accept_outdated  -imageName $imageName -containerName $DockerContainerFriendlyName -Credential $DockerCredentials @params -alwaysPull -includeCSide -restart no
             $DockerCreated = $true
         }
         $DockerContainerId = Get-NavContainerId -containerName $DockerContainerFriendlyName 
